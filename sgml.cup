@@ -1,0 +1,11 @@
+import java_cup.runtime.*;
+
+
+
+non terminal OPENTAG;
+terminal  String NAME;
+terminal OPEN, ENDTAG, ORPHANCLOSURE, CLOSED, FLAGS;
+
+
+OPENTAG ::= OPEN NAME:t ENDTAG {:System.out.println("We have an opening of tag of type "+t);:}
+;
