@@ -2,10 +2,18 @@ import java_cup.runtime.*;
 
 
 
-non terminal OPENTAG;
+non terminal openTag, closingTag, tag, file, orphanTag;
 terminal  String NAME;
 terminal OPEN, ENDTAG, ORPHANCLOSURE, CLOSED, FLAGS;
 
 
-OPENTAG ::= OPEN NAME:t ENDTAG {:System.out.println("We have an opening of tag of type "+t);:}
-;
+file ::= tag;
+file ::= tag file;
+
+tag ::= openTag | closingTag | orphanTag;
+
+openTag ::= OPEN NAME:t ENDTAG {:System.out.print("+"+t+" ");:};
+
+orphanTag ::= OPEN NAME:t ORPHANCLOSURE {:System.out.print(t+" ");:};
+
+closingTag ::= CLOSED NAME:t ENDTAG {:System.out.print("-"+t+" ");:};
