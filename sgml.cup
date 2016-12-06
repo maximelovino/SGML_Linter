@@ -1,9 +1,4 @@
 import java_cup.runtime.*;
-import java.util.Stack;
-
-parser code {:
-	Stack<String> st = new Stack<>();
-:}
 
 non terminal openTag, closingTag, tag, file, orphanTag;
 terminal String NAME;
@@ -12,19 +7,18 @@ terminal OPEN, ENDTAG, ORPHANCLOSURE, CLOSED, FLAGS;
 
 file ::= orphanTag;
 file ::= orphanTag file;
-file ::= openTag file closingTag;
-file ::= openTag closingTag;
-file ::= openTag closingTag file;
+file ::= openTag:n1 file closingTag:n2 {:if(!n2.equals(n1)) throw new Exception("order of tag is incorrect");:};
+file ::= openTag:n1 closingTag:n2 {:if(!n2.equals(n1)) throw new Exception("order of tag is incorrect");:};
+file ::= openTag:n1 closingTag:n2 file {:if(!n2.equals(n1)) throw new Exception("order of tag is incorrect");:};
 
-openTag ::= OPEN NAME:t ENDTAG {:System.out.print("+"+t+" "); st.push(t);:};
+openTag ::= OPEN NAME:t ENDTAG {:System.out.print("+"+t+" "); RESULT = new String(t);:};
 
 orphanTag ::= OPEN NAME:t ORPHANCLOSURE {:System.out.print(t+" ");:};
 orphanTag ::= OPEN NAME:t FLAGS ORPHANCLOSURE {:System.out.print(t+" ");:};
 
-openTag ::= OPEN NAME:t FLAGS ENDTAG {:System.out.print("+"+t+" ");st.push(t);:};
+openTag ::= OPEN NAME:t FLAGS ENDTAG {:System.out.print("+"+t+" "); RESULT = new String(t);:};
 
 closingTag ::= CLOSED NAME:t ENDTAG {:
 	System.out.print("-"+t+" ");
-	String temp = st.pop();
-	if(!t.equals(temp)) throw new Exception("order incorrect");
+	RESULT = new String(t);
 :};
