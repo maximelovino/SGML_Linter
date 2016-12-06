@@ -1,19 +1,30 @@
 import java_cup.runtime.*;
+import java.util.Stack;
 
-
+parser code {:
+	Stack<String> st = new Stack<>();
+:}
 
 non terminal openTag, closingTag, tag, file, orphanTag;
-terminal  String NAME;
+terminal String NAME;
 terminal OPEN, ENDTAG, ORPHANCLOSURE, CLOSED, FLAGS;
 
 
-file ::= tag;
-file ::= tag file;
+file ::= orphanTag;
+file ::= orphanTag file;
+file ::= openTag file closingTag;
+file ::= openTag closingTag;
+file ::= openTag closingTag file;
 
-tag ::= openTag | closingTag | orphanTag;
-
-openTag ::= OPEN NAME:t ENDTAG {:System.out.print("+"+t+" ");:};
+openTag ::= OPEN NAME:t ENDTAG {:System.out.print("+"+t+" "); st.push(t);:};
 
 orphanTag ::= OPEN NAME:t ORPHANCLOSURE {:System.out.print(t+" ");:};
+orphanTag ::= OPEN NAME:t FLAGS ORPHANCLOSURE {:System.out.print(t+" ");:};
 
-closingTag ::= CLOSED NAME:t ENDTAG {:System.out.print("-"+t+" ");:};
+openTag ::= OPEN NAME:t FLAGS ENDTAG {:System.out.print("+"+t+" ");st.push(t);:};
+
+closingTag ::= CLOSED NAME:t ENDTAG {:
+	System.out.print("-"+t+" ");
+	String temp = st.pop();
+	if(!t.equals(temp)) throw new Exception("order incorrect");
+:};

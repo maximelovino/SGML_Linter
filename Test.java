@@ -9,9 +9,9 @@ class Test {
 			parser myParser = new parser(myLexer);
 			try {
 				myParser.parse();
+				System.out.println();
 			}catch (Exception e){
-				e.printStackTrace();
-				System.out.println("parse error");
+				System.out.println("There is an error");
 			}
 		}catch (Exception e) {
 			e.printStackTrace();
