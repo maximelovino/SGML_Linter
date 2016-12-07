@@ -8,6 +8,7 @@ terminal OPEN, ENDTAG, ORPHANCLOSURE, CLOSED, FLAGS;
 file ::= orphanTag;
 file ::= orphanTag file;
 file ::= openTag:n1 file closingTag:n2 {:if(!n2.equals(n1)) throw new Exception("order of tag is incorrect");:};
+file ::= openTag:n1 file closingTag:n2 file {:if(!n2.equals(n1)) throw new Exception("order of tag is incorrect");:};
 file ::= openTag:n1 closingTag:n2 {:if(!n2.equals(n1)) throw new Exception("order of tag is incorrect");:};
 file ::= openTag:n1 closingTag:n2 file {:if(!n2.equals(n1)) throw new Exception("order of tag is incorrect");:};
 
