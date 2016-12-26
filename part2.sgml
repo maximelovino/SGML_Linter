@@ -1,0 +1,9 @@
+<#set id="12"/>
+<C>
+	<#if id=="13">
+		tata
+	<#if/>
+	<#if id=="12">
+		titi
+	<#if/>
+</C>

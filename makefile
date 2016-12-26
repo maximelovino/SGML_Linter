@@ -11,6 +11,14 @@ cup: sgml.flex sgml.cup Test.java
 sgml: sgml.flex
 	jflex sgml.flex
 
+part2: sgml.flex
+	jflex sgml.flex
+	javac SGML.java
+	java SGML part2.sgml
+
+cleanPart2:
+	rm *.class SGML.java
+
 run: sgml cup
 	java -classpath .:java-cup-11b.jar Test example.sgml
 
