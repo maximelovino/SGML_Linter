@@ -2,7 +2,7 @@ import java_cup.runtime.*;
 
 parser code {:
 	String fileID = null;
-	boolean toOutput = false;
+	boolean toOutput = true;
 
 	String getNameFromOpenTag(String tag){
 		return String.valueOf(tag.charAt(1));
@@ -13,33 +13,38 @@ parser code {:
 	}
 :}
 
-non terminal file;
+non terminal file, openif, setter, endif, opentag, closedtag, orphantag;
 terminal OPENTAG, CLOSINGTAG, ORPHAN, OPENIF, CLOSEIF, SET, CONTENT;
 
-file ::= ORPHAN;
-file ::= ORPHAN file;
-file ::= CONTENT;
-file ::= CONTENT file;
-file ::= OPENTAG:n1 CLOSINGTAG:n2 {:if(!getNameFromOpenTag((String)n1).equals(getNameFromClosingTag((String)n2))) throw new Exception ("order of tag is incorrect");:};
-file ::= OPENTAG:n1 file CLOSINGTAG:n2 {:if(!getNameFromOpenTag((String)n1).equals(getNameFromClosingTag((String)n2))) throw new Exception ("order of tag is incorrect");:};
-file ::= OPENTAG:n1 file CLOSINGTAG:n2 file {:
-		if(!getNameFromOpenTag((String)n1).equals(getNameFromClosingTag((String)n2))) throw new Exception ("order of tag is incorrect");
+file ::= orphantag;
+file ::= orphantag file;
+file ::= CONTENT:t {:if(toOutput) System.out.println(String.valueOf(t));:};
+file ::= CONTENT:t file{:if(toOutput) System.out.println(String.valueOf(t));:};
+file ::= opentag:n1 closedtag:n2 {:if(!n1.equals(n2)) throw new Exception ("order of tag is incorrect");:};
+file ::= opentag:n1 file closedtag:n2 {:if(!n1.equals(n2)) throw new Exception ("order of tag is incorrect");:};
+file ::= opentag:n1 file closedtag:n2 file {:
+		if(!n1.equals(n2)) throw new Exception ("order of tag is incorrect");
 :};
-file ::= OPENTAG:n1 CLOSINGTAG:n2 file {:
-		if(!getNameFromOpenTag((String)n1).equals(getNameFromClosingTag((String)n2))) throw new Exception ("order of tag is incorrect");
+file ::= opentag:n1 closedtag:n2 file {:
+		if(!n1.equals(n2)) throw new Exception ("order of tag is incorrect");
 :};
 
-file ::= SET:id {:fileID = (String) id;:};
-file ::= SET:id file {:fileID = (String) id;:};
-file ::= OPENIF:n1 CLOSEIF {:
+file ::= setter;
+file ::= setter file;
+file ::= openif endif {:
 :};
-file ::= OPENIF:n1 file:t CLOSEIF {:
-	toOutput = (fileID != null && fileID.equals(n1));
-	if(toOutput) System.out.println(t);
+file ::= openif file endif {:
 :};
-file ::= OPENIF:n1 file:t CLOSEIF file {:
-	toOutput = (fileID != null && fileID.equals(n1));
-	if(toOutput) System.out.println(t);
+file ::= openif file endif file {:
 :};
-file ::= OPENIF:n1 CLOSEIF file {:
+file ::= openif endif file {:
 :};
+
+openif ::= OPENIF:n1 {:toOutput = (fileID != null && fileID.equals(n1));:};
+setter ::= SET:n1 {:fileID = (String) n1;:};
+endif ::= CLOSEIF {:toOutput = true;:};
+
+opentag ::= OPENTAG:t {:if(toOutput) System.out.println(t); RESULT = getNameFromOpenTag((String)t);:};
+closedtag ::= CLOSINGTAG:t {:if(toOutput) System.out.println(t); RESULT = getNameFromClosingTag((String)t);:};
+orphantag ::= ORPHAN:t {:if(toOutput) System.out.println(t);:};
+/*Set toOuput to True outside if tags*/
