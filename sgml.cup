@@ -1,25 +1,45 @@
 import java_cup.runtime.*;
 
-non terminal openTag, closingTag, tag, file, orphanTag;
-terminal String NAME;
-terminal OPEN, ENDTAG, ORPHANCLOSURE, CLOSED, FLAGS;
+parser code {:
+	String fileID = null;
+	boolean toOutput = false;
 
+	String getNameFromOpenTag(String tag){
+		return String.valueOf(tag.charAt(1));
+	}
 
-file ::= orphanTag;
-file ::= orphanTag file;
-file ::= openTag:n1 file closingTag:n2 {:if(!n2.equals(n1)) throw new Exception("order of tag is incorrect");:};
-file ::= openTag:n1 file closingTag:n2 file {:if(!n2.equals(n1)) throw new Exception("order of tag is incorrect");:};
-file ::= openTag:n1 closingTag:n2 {:if(!n2.equals(n1)) throw new Exception("order of tag is incorrect");:};
-file ::= openTag:n1 closingTag:n2 file {:if(!n2.equals(n1)) throw new Exception("order of tag is incorrect");:};
+	String getNameFromClosingTag(String tag){
+		return String.valueOf(tag.charAt(2));
+	}
+:}
 
-openTag ::= OPEN NAME:t ENDTAG {:System.out.print("+"+t+" "); RESULT = new String(t);:};
+non terminal file;
+terminal OPENTAG, CLOSINGTAG, ORPHAN, OPENIF, CLOSEIF, SET, CONTENT;
 
-orphanTag ::= OPEN NAME:t ORPHANCLOSURE {:System.out.print(t+" ");:};
-orphanTag ::= OPEN NAME:t FLAGS ORPHANCLOSURE {:System.out.print(t+" ");:};
+file ::= ORPHAN;
+file ::= ORPHAN file;
+file ::= CONTENT;
+file ::= CONTENT file;
+file ::= OPENTAG:n1 CLOSINGTAG:n2 {:if(!getNameFromOpenTag((String)n1).equals(getNameFromClosingTag((String)n2))) throw new Exception ("order of tag is incorrect");:};
+file ::= OPENTAG:n1 file CLOSINGTAG:n2 {:if(!getNameFromOpenTag((String)n1).equals(getNameFromClosingTag((String)n2))) throw new Exception ("order of tag is incorrect");:};
+file ::= OPENTAG:n1 file CLOSINGTAG:n2 file {:
+		if(!getNameFromOpenTag((String)n1).equals(getNameFromClosingTag((String)n2))) throw new Exception ("order of tag is incorrect");
+:};
+file ::= OPENTAG:n1 CLOSINGTAG:n2 file {:
+		if(!getNameFromOpenTag((String)n1).equals(getNameFromClosingTag((String)n2))) throw new Exception ("order of tag is incorrect");
+:};
 
-openTag ::= OPEN NAME:t FLAGS ENDTAG {:System.out.print("+"+t+" "); RESULT = new String(t);:};
-
-closingTag ::= CLOSED NAME:t ENDTAG {:
-	System.out.print("-"+t+" ");
-	RESULT = new String(t);
+file ::= SET:id {:fileID = (String) id;:};
+file ::= SET:id file {:fileID = (String) id;:};
+file ::= OPENIF:n1 CLOSEIF {:
+:};
+file ::= OPENIF:n1 file:t CLOSEIF {:
+	toOutput = (fileID != null && fileID.equals(n1));
+	if(toOutput) System.out.println(t);
+:};
+file ::= OPENIF:n1 file:t CLOSEIF file {:
+	toOutput = (fileID != null && fileID.equals(n1));
+	if(toOutput) System.out.println(t);
+:};
+file ::= OPENIF:n1 CLOSEIF file {:
 :};

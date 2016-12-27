@@ -11,6 +11,7 @@ class Test {
 				myParser.parse();
 				System.out.println();
 			}catch (Exception e){
+				e.printStackTrace();
 				System.out.println("There is an error");
 			}
 		}catch (Exception e) {
