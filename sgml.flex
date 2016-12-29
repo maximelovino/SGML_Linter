@@ -33,6 +33,7 @@ word=[A-Za-z]+
 {closingIf} {return new Symbol(sym.CLOSEIF);}
 {setter} {return new Symbol(sym.SET,getIdFromTag(yytext()));}
 {word} {return new Symbol(sym.CONTENT, yytext());}
+<<EOF>> {return new Symbol(sym.EOF);}
 \n {;}
 \s {;}
 . {;}

@@ -19,8 +19,11 @@ part2Standalone: sgml.flex
 cleanPart2Standalone:
 	rm *.class SGML.java
 
-run: sgml cup
+runPart2: sgml cup
 	java -classpath .:java-cup-11b.jar Test part2.sgml
+
+runPart1: sgml cup
+	java -classpath .:java-cup-11b.jar Test example.sgml
 
 clean:
 	rm *.class sym.java parser.java SGML.java\~ SGML.java

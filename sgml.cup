@@ -2,8 +2,10 @@ import java_cup.runtime.*;
 
 parser code {:
 	String fileID = null;
-	boolean toOutput = true;
-
+	boolean toOutput = false;
+	String simplifiedFileContent = "";
+	int tabLevel = 0;
+	boolean expanded = false;
 	String getNameFromOpenTag(String tag){
 		return String.valueOf(tag.charAt(1));
 	}
@@ -13,38 +15,71 @@ parser code {:
 	}
 :}
 
-non terminal file, openif, setter, endif, opentag, closedtag, orphantag;
+non terminal file, content, openif, setter, endif, opentag, closedtag, orphantag;
 terminal OPENTAG, CLOSINGTAG, ORPHAN, OPENIF, CLOSEIF, SET, CONTENT;
-
-file ::= orphantag;
-file ::= orphantag file;
-file ::= CONTENT:t {:if(toOutput) System.out.println(String.valueOf(t));:};
-file ::= CONTENT:t file{:if(toOutput) System.out.println(String.valueOf(t));:};
-file ::= opentag:n1 closedtag:n2 {:if(!n1.equals(n2)) throw new Exception ("order of tag is incorrect");:};
-file ::= opentag:n1 file closedtag:n2 {:if(!n1.equals(n2)) throw new Exception ("order of tag is incorrect");:};
-file ::= opentag:n1 file closedtag:n2 file {:
+file ::= content {:System.out.println();if(expanded){
+	System.out.println("Simplified file: \n");
+	System.out.println(simplifiedFileContent);
+	}:};
+content ::= orphantag;
+content ::= orphantag content;
+content ::= CONTENT:t {:if(toOutput){
+		for (int i = 0; i<tabLevel;i++){
+			simplifiedFileContent += "\t";
+		}
+		simplifiedFileContent += String.valueOf(t) + "\n";
+	}:};
+content ::= CONTENT:t content{:if(toOutput){
+		for (int i = 0; i<tabLevel;i++){
+			simplifiedFileContent += "\t";
+		}
+		simplifiedFileContent += String.valueOf(t) + "\n";
+	}:};
+content ::= opentag:n1 closedtag:n2 {:if(!n1.equals(n2)) throw new Exception ("order of tag is incorrect");:};
+content ::= opentag:n1 content closedtag:n2 {:if(!n1.equals(n2)) throw new Exception ("order of tag is incorrect");:};
+content ::= opentag:n1 content closedtag:n2 content {:
 		if(!n1.equals(n2)) throw new Exception ("order of tag is incorrect");
 :};
-file ::= opentag:n1 closedtag:n2 file {:
+content ::= opentag:n1 closedtag:n2 content {:
 		if(!n1.equals(n2)) throw new Exception ("order of tag is incorrect");
 :};
 
-file ::= setter;
-file ::= setter file;
-file ::= openif endif {:
-:};
-file ::= openif file endif {:
-:};
-file ::= openif file endif file {:
-:};
-file ::= openif endif file {:
-:};
+content ::= setter;
+content ::= setter content;
+content ::= openif endif;
+content ::= openif content endif;
+content ::= openif content endif content;
+content ::= openif endif content;
 
 openif ::= OPENIF:n1 {:toOutput = (fileID != null && fileID.equals(n1));:};
-setter ::= SET:n1 {:fileID = (String) n1;:};
+setter ::= SET:n1 {:toOutput = true; expanded = true; fileID = (String) n1;:};
 endif ::= CLOSEIF {:toOutput = true;:};
 
-opentag ::= OPENTAG:t {:if(toOutput) System.out.println(t); RESULT = getNameFromOpenTag((String)t);:};
-closedtag ::= CLOSINGTAG:t {:if(toOutput) System.out.println(t); RESULT = getNameFromClosingTag((String)t);:};
-orphantag ::= ORPHAN:t {:if(toOutput) System.out.println(t);:};
+opentag ::= OPENTAG:t {:
+	if(toOutput){
+		for (int i = 0; i<tabLevel;i++){
+			simplifiedFileContent += "\t";
+		}
+		simplifiedFileContent += String.valueOf(t) + "\n";
+		tabLevel ++;
+	}
+	System.out.print("+"+getNameFromOpenTag(String.valueOf(t))+" ");
+	RESULT = getNameFromOpenTag((String)t);:};
+closedtag ::= CLOSINGTAG:t {:if(toOutput){
+		tabLevel--;
+		for (int i = 0; i<tabLevel;i++){
+			simplifiedFileContent += "\t";
+		}
+		simplifiedFileContent += String.valueOf(t) + "\n";
+	}
+	System.out.print("-"+getNameFromClosingTag(String.valueOf(t))+" ");
+	RESULT = getNameFromClosingTag((String)t);:};
+orphantag ::= ORPHAN:t {:if(toOutput){
+		for (int i = 0; i<tabLevel;i++){
+			simplifiedFileContent += "\t";
+		}
+		simplifiedFileContent += String.valueOf(t) + "\n";
+	}
+	System.out.print(getNameFromOpenTag(String.valueOf(t))+" ");
+	:};
 /*Set toOuput to True outside if tags*/
