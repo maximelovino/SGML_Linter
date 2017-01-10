@@ -1,6 +1,7 @@
+FILE=example.sgml
 all: run
 
-cup: sgml.flex sgml.cup Test.java
+cup: sgml sgml.cup Test.java
 	java -jar java-cup-11b.jar sgml.cup
 	javac -classpath .:java-cup-11b.jar sym.java
 	javac -classpath .:java-cup-11b.jar parser.java
@@ -11,19 +12,8 @@ cup: sgml.flex sgml.cup Test.java
 sgml: sgml.flex
 	jflex sgml.flex
 
-part2Standalone: sgml.flex
-	jflex sgml.flex
-	javac SGML.java
-	java SGML part2.sgml
-
-cleanPart2Standalone:
-	rm *.class SGML.java
-
-runPart2: sgml cup
-	java -classpath .:java-cup-11b.jar Test part2.sgml
-
-runPart1: sgml cup
-	java -classpath .:java-cup-11b.jar Test example.sgml
+run: cup
+	java -classpath .:java-cup-11b.jar Test $(FILE)
 
 clean:
 	rm *.class sym.java parser.java SGML.java\~ SGML.java

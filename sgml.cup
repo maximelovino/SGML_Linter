@@ -82,4 +82,3 @@ orphantag ::= ORPHAN:t {:if(toOutput){
 	}
 	System.out.print(getNameFromOpenTag(String.valueOf(t))+" ");
 	:};
-/*Set toOuput to True outside if tags*/
