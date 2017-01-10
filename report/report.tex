@@ -1,0 +1,34 @@
+\documentclass[a4paper]{article}
+\title{SGML Linter avec JFlex et CUP}
+\author{Maxime Lovino}
+\usepackage[francais]{babel}
+\usepackage{fontspec}
+\usepackage{amsmath}
+\usepackage{amsfonts}
+\usepackage{xcolor,graphicx}
+\definecolor{light-gray}{gray}{0.95}
+\usepackage{minted}
+\usemintedstyle{colorful}
+\setlength{\parindent}{0pt}
+\usepackage[left=2.5cm,top=2.5cm,right=2.5cm,bottom=2.5cm]{geometry}
+\begin{document}
+\maketitle
+\newpage
+\section{Introduction}
+J'ai donc réalisé un Linter pour des fichiers de type SGML, ainsi que SGML étendu en utilisant JFlex et CUP. Le linter va vérifier la validité du fichier SGML, c'est-à-dire par exemple l'ordre d'ouverture et de fermeture des balises. Dans le cas d'un fichier SGML étendu, le programme va également afficher la version simplifiée après évaluation des conditions du fichier.
+\section{Détection des différents symboles avec JFlex}
+Le programme JFlex va détecter les différents éléments composants le langage SGML et envoyer les symboles à CUP, il s'agit des
+\begin{itemize}
+	\item Balises ouvrantes (avec ou sans attributs) $\Rightarrow$ \verb+OPENTAG+
+	\item Balises inline (avec ou sans attributs) $\Rightarrow$ \verb+ORPHAN+
+	\item Balises fermantes $\Rightarrow$ \verb+CLOSINGTAG+
+	\item Contenu entre deux balises $\Rightarrow$ \verb+CONTENT+
+\end{itemize}
+Ensuite, pour gérer les fichiers étendus, on ajoute la détection de
+\begin{itemize}
+	\item Setter pour set une variable $\Rightarrow$ \verb+SET+
+	\item If ouvrant $\Rightarrow$ \verb+OPENIF+
+	\item If fermant $\Rightarrow$ \verb+CLOSEIF+
+\end{itemize}
+A la fin du fichier, nous retournons le symbole \verb+EOF+ à CUP également. Avec les différentes balises et le contenu, on retourne à CUP le texte entier de ce que nous détectons (car nous devons pouvoir réecrire le fichier de façon simplifiée) alors que pour le If ouvrant et le Setter, on ne renvoie que la valeur de l'id, grâce à une fonction en java qui retourne cette valeur à partir du tag entier (utilisation de \verb+String.split+ sur le caractère \verb+"+) 
+\end{document}
