@@ -30,5 +30,30 @@ Ensuite, pour gérer les fichiers étendus, on ajoute la détection de
 	\item If ouvrant $\Rightarrow$ \verb+OPENIF+
 	\item If fermant $\Rightarrow$ \verb+CLOSEIF+
 \end{itemize}
-A la fin du fichier, nous retournons le symbole \verb+EOF+ à CUP également. Avec les différentes balises et le contenu, on retourne à CUP le texte entier de ce que nous détectons (car nous devons pouvoir réecrire le fichier de façon simplifiée) alors que pour le If ouvrant et le Setter, on ne renvoie que la valeur de l'id, grâce à une fonction en java qui retourne cette valeur à partir du tag entier (utilisation de \verb+String.split+ sur le caractère \verb+"+) 
+A la fin du fichier, nous retournons le symbole \verb+EOF+ à CUP également. Avec les différentes balises et le contenu, on retourne à CUP le texte entier de ce que nous détectons (car nous devons pouvoir réecrire le fichier de façon simplifiée) alors que pour le If ouvrant et le Setter, on ne renvoie que la valeur de l'id, grâce à une fonction en java qui retourne cette valeur à partir du tag entier (utilisation de \verb+String.split+ sur le caractère \verb+"+)
+\section{Analyse syntaxique avec CUP}
+Dans le programme CUP, l'analyse syntaxique du langage est réalisée, c'est-à-dire que c'est dans cette partie que nous allons vérifier l'ordre d'ouverture et de fermeture des balises, ainsi que produire la version simplifiée d'un fichier SGML étendu.
+On utilise les symboles non terminaux suivants:
+\begin{itemize}
+	\item file, symbolisant notre fichier SGML
+	\item content, symbolisant le contenu du fichier (voir plus bas pour la raison de la distinction)
+	\item openif
+	\item setter
+	\item endif
+	\item opentag
+	\item closedtag
+	\item orphantag
+\end{itemize}
+Ensuite on définit les symboles terminaux suivants également, qui sont ceux renvoyés par JFlex:
+\begin{itemize}
+	\item OPENTAG
+	\item CLOSINGTAG
+	\item ORPHAN
+	\item OPENIF
+	\item CLOSEIF
+	\item SET
+	\item CONTENT \\
+\end{itemize}
+
+Ici, en fait nous distinguons \verb+file+ et \verb+content+ pour pouvoir lancer l'affichage de notre fichier simplifié en fin de parsing du fichier. C'est-à-dire que CUP va détecter un \verb+file+ qui comprend un \verb+content+ uniquement puis va sauter aux règles pour content, ensuite à la fin de ses règles il va revenir au code de la règle pour \verb+file+ et afficher le fichier simplifié dans le cas où il s'agit d'un fichier SGML étendu.
 \end{document}
