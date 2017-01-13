@@ -19,7 +19,7 @@ non terminal file, content, openif, setter, endif, opentag, closedtag, orphantag
 terminal OPENTAG, CLOSINGTAG, ORPHAN, OPENIF, CLOSEIF, SET, CONTENT;
 file ::= content {:System.out.println();if(expanded){
 	System.out.println("Simplified file: \n");
-	System.out.println(simplifiedFileContent);
+	System.out.print(simplifiedFileContent);
 	}:};
 content ::= orphantag;
 content ::= orphantag content;

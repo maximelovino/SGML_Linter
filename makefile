@@ -1,7 +1,7 @@
 FILE=example.sgml
 all: run
 
-cup: sgml sgml.cup Test.java
+Test.class: SGML.java sgml.cup Test.java
 	java -jar java-cup-11b.jar sgml.cup
 	javac -classpath .:java-cup-11b.jar sym.java
 	javac -classpath .:java-cup-11b.jar parser.java
@@ -9,10 +9,10 @@ cup: sgml sgml.cup Test.java
 	javac -classpath .:java-cup-11b.jar SGML.java
 	javac -classpath .:java-cup-11b.jar Test.java
 
-sgml: sgml.flex
+SGML.java: sgml.flex
 	jflex sgml.flex
 
-run: cup
+run: Test.class
 	java -classpath .:java-cup-11b.jar Test $(FILE)
 
 clean:
