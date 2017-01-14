@@ -43,6 +43,7 @@ On utilise les symboles non terminaux suivants:
 	\item opentag
 	\item closedtag
 	\item orphantag
+	\item text
 \end{itemize}
 Ensuite on définit les symboles terminaux suivants également, qui sont ceux renvoyés par JFlex:
 \begin{itemize}
@@ -55,5 +56,15 @@ Ensuite on définit les symboles terminaux suivants également, qui sont ceux re
 	\item CONTENT \\
 \end{itemize}
 
-Ici, en fait nous distinguons \verb+file+ et \verb+content+ pour pouvoir lancer l'affichage de notre fichier simplifié en fin de parsing du fichier. C'est-à-dire que CUP va détecter un \verb+file+ qui comprend un \verb+content+ uniquement puis va sauter aux règles pour content, ensuite à la fin de ses règles il va revenir au code de la règle pour \verb+file+ et afficher le fichier simplifié dans le cas où il s'agit d'un fichier SGML étendu.
+Ici, en fait nous distinguons \verb+file+ et \verb+content+ pour pouvoir lancer l'affichage de notre fichier simplifié en fin de parsing du fichier. C'est-à-dire que CUP va détecter un \verb+file+ qui comprend un \verb+content+ uniquement puis va sauter aux règles pour \verb+content+, ensuite à la fin de ses règles il va revenir au code de la règle pour \verb+file+ et afficher le fichier simplifié dans le cas où il s'agit d'un fichier SGML étendu.
+
+\subsection{Logique pour l'affichage d'un fichier simplifié à partir d'un fichier étendu}
+Pour la détection et la création d'un fichier simplfié à partir d'un fichier SGML étendu, j'utilise un \verb`boolean` nommé \verb`expanded` qui va passer à \verb+true+ dès la détection d'un tag \verb+<#set...>+, ce booléen va faire en sorte qu'un fichier simplifié soit affiché ou pas à la fin de l'execution du programme. En effet, le fichier simplifié est de toute façon créé, sauf que sans balise \verb+set+, tout le code sera affiché, car il fait entièrement parti du fichier simplifié. \\
+
+L'id utilisé par le fichier et servant ensuite à décider de ce qui est interprété du fichier est stocké dans la \verb+String fileID+
+
+Au niveau de la détection de ce qui sera contenu dans le fichier simplifié, le \verb+boolean+ nommé \verb+toOutput+ est de base à \verb+true+ et va changer à la detection d'un tag \verb+if+ ouvrant en fonction de la validation de la condition, puis repasser à \verb+true+ lors de la fermeture du \verb+if+. En effet, ce qui n'est pas entre dans une condition est affiché de toute façon. Lors de la détection de tout autre contenu (balises, texte), ce contenu est ajouté à la \verb+String simplifiedFileContent+ avec l'indendation correcte que l'on calcule en partant à 0 et en l'incrémentant d'un niveau en cas de balise ouvrante, et en la décrementant de 1 en cas de balise fermante.
+\subsection{Logique pour la détection de l'ordre des balises}
+
+
 \end{document}

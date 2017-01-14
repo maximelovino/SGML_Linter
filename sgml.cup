@@ -2,7 +2,7 @@ import java_cup.runtime.*;
 
 parser code {:
 	String fileID = null;
-	boolean toOutput = false;
+	boolean toOutput = true;
 	String simplifiedFileContent = "";
 	int tabLevel = 0;
 	boolean expanded = false;
@@ -15,26 +15,16 @@ parser code {:
 	}
 :}
 
-non terminal file, content, openif, setter, endif, opentag, closedtag, orphantag;
+non terminal file, content, openif, setter, endif, opentag, closedtag, orphantag, text;
 terminal OPENTAG, CLOSINGTAG, ORPHAN, OPENIF, CLOSEIF, SET, CONTENT;
 file ::= content {:System.out.println();if(expanded){
-	System.out.println("Simplified file: \n");
+	System.out.println("Simplified file:");
 	System.out.print(simplifiedFileContent);
 	}:};
 content ::= orphantag;
 content ::= orphantag content;
-content ::= CONTENT:t {:if(toOutput){
-		for (int i = 0; i<tabLevel;i++){
-			simplifiedFileContent += "\t";
-		}
-		simplifiedFileContent += String.valueOf(t) + "\n";
-	}:};
-content ::= CONTENT:t content{:if(toOutput){
-		for (int i = 0; i<tabLevel;i++){
-			simplifiedFileContent += "\t";
-		}
-		simplifiedFileContent += String.valueOf(t) + "\n";
-	}:};
+content ::= text;
+content ::= text content;
 content ::= opentag:n1 closedtag:n2 {:if(!n1.equals(n2)) throw new Exception ("order of tag is incorrect");:};
 content ::= opentag:n1 content closedtag:n2 {:if(!n1.equals(n2)) throw new Exception ("order of tag is incorrect");:};
 content ::= opentag:n1 content closedtag:n2 content {:
@@ -54,6 +44,15 @@ content ::= openif endif content;
 openif ::= OPENIF:n1 {:toOutput = (fileID != null && fileID.equals(n1));:};
 setter ::= SET:n1 {:toOutput = true; expanded = true; fileID = (String) n1;:};
 endif ::= CLOSEIF {:toOutput = true;:};
+
+text ::= CONTENT:t {:
+	if(toOutput){
+			for (int i = 0; i<tabLevel;i++){
+				simplifiedFileContent += "\t";
+			}
+			simplifiedFileContent += String.valueOf(t) + "\n";
+	}
+:};
 
 opentag ::= OPENTAG:t {:
 	if(toOutput){

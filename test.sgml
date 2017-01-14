@@ -1,0 +1,15 @@
+<C>
+    <#if id=="13">
+    <E>
+    </E>
+    tata
+    <#if/>
+    <A>
+        coucou  
+        <B/>
+    </A>
+    <#set id="12"/>
+    <#if id=="12">
+    titi
+    <#if/>
+</C>

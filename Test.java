@@ -8,10 +8,10 @@ class Test {
 			SGML myLexer = new SGML(reader);
 			parser myParser = new parser(myLexer);
 			try {
+				System.out.println("===========PARSING THE FILE===========");
 				myParser.parse();
 			}catch (Exception e){
-				e.printStackTrace();
-				System.out.println("There is an error");
+				System.out.println("(Error)");
 			}
 		}catch (Exception e) {
 			e.printStackTrace();

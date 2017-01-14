@@ -14,8 +14,6 @@ import java_cup.runtime.*;
 	}
 %}
 
-/* add everything and not just numbers */
-
 openTag=<[A-Z](\s[a-z]\=\"[0-9]*\,[0-9]*\")?>
 orphanTag=<[A-Z](\s[a-z]\=\"[0-9]*\,[0-9]*\")?\/>
 closingTag=<\/[A-Z]>
