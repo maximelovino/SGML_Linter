@@ -29,7 +29,7 @@ An example of an extended SGML file is
 </C>
 ```
 ## How to use it?
-To compile and run the program, you can just use the `make` target called `run` with the file that you want to check.
+To compile and run the program, you can just use the `make` target called `run` with the file that you want to check. Note that jflex must be installed on your machine and be in your PATH.
 The syntax is
 ```
 make run FILE=<filename>
